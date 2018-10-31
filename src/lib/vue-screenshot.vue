@@ -1,5 +1,11 @@
 <template>
-    <div class="screenshot" @contextmenu="stopRightKey($event)">
+    <div 
+        :style="{
+            'width' : width + 'px',
+            'height' : height + 'px',
+        }"
+        class="screenshot" 
+        @contextmenu="stopRightKey($event)">
         <input 
             id="imageScreenshotPic" 
             type="file" 
