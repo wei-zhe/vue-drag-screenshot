@@ -1,11 +1,15 @@
 {
   "name": "vue-drag-screenshot",
   "description": "A Vue component to drag-screenshot",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "author": "WeiZhe <2270734250@qq.com>",
   "license": "MIT",
-  "main": "dist/vue-pay-keyboard.js",
+  "main": "dist/vue-drag-screenshot.js",
   "private": false,
+  "files": [  
+    "dist",
+    "src"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/yucccc/vue-pay-keyboard"

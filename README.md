@@ -3,7 +3,7 @@
 A Vue component to drag-screenshot
 一个图片裁剪工具
  ## demo演示
- [demo](http://mall.yucccc.com/vuepayboard/)
+ [demo](https://github.com/wei-zhe/vue-drag-screenshot)
  
  ## 安装
  
