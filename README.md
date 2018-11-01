@@ -28,7 +28,7 @@ A Vue component to drag-screenshot
  ```
 
 ## v-model
-    实时刷新的截图
+实时刷新的截图
 
 ```js
     // ES6
