@@ -38,10 +38,10 @@ A Vue component to drag-screenshot
 
 ### Props
  
- |    name    |    Description   |   type   |default|
- | -----------------  | ---------------- | :--------: | :----------: |
- | width    | 截图区域宽        | Number	| 500
- | height   | 截图区域高        | Number	| 500
- | imageSrc | 传入需要裁剪的图片 | String	 | ''
+ |   name   |  Description  |   type   | default | type |
+ | -------- | ------------- | :------: | :-----: | ---- |
+ | width    | 截图区域宽        | Number	| 500 |（必传）
+ | height   | 截图区域高        | Number	| 500 |（必传）
+ | imageSrc | 传入需要裁剪的图片 | String	 |     | 选择参数，也可以不传
  
  
