@@ -17,7 +17,12 @@ A Vue component to drag-screenshot
  // ES6
  import vuedragscreenshot from 'vue-drag-screenshot'
  
- 
  Vue.use(vuedragscreenshot)
+ <vue-screenshot 
+    v-model="parentValue"
+    :width="500"
+    :height="500"
+    >
+</vue-screenshot>
  
  
