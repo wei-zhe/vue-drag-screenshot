@@ -18,11 +18,28 @@ A Vue component to drag-screenshot
  import vuedragscreenshot from 'vue-drag-screenshot'
  
  Vue.use(vuedragscreenshot)
+
  <vue-screenshot 
     v-model="parentValue"
     :width="500"
     :height="500"
     >
 </vue-screenshot>
+ ```
+
+## v-model
+    实时刷新的截图
+
+```js
+    // ES6
+    <img :src="parentValue"/>
+ ```
+
+### Props
+ 
+ |    name    |    Description   |   type   |default|
+ | -----------------  | ---------------- | :--------: | :----------: |
+ | width  | 截图区域宽 | Number	| 500
+ | height | 截图区域高 | Number	| 500
  
  
