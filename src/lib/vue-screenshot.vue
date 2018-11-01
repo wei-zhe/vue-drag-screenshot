@@ -266,7 +266,10 @@ export default {
             default: 500
         }, 
         parentValue : {},
-        value : {},
+        imageSrc : {
+            type: String,
+            default: ''
+        },
     },
     model: {
       prop: 'value',//绑定的值，通过父组件传递
@@ -312,7 +315,8 @@ export default {
         }
     },
     watch : {
-        'value': function(val, oldval) {
+        'imageSrc': function(val, oldval) {
+            this.newAddImage(this.imageSrc)
         },
         'imgData.top': function(val, oldval) {
         },
@@ -327,10 +331,10 @@ export default {
             this.moveDomDataFs();
         },
     },
-    computed: {
-        
+    computed: {  
     },
     mounted () {
+        this.newAddImage(this.imageSrc)
     },
     methods: {
         uploadImage(event) {  // 素材上传图片
@@ -359,39 +363,7 @@ export default {
             let _this = this;
 
             reader.onload = function(e) {
-                _this.image    = new Image();
-                _this.image.onload  = () => {
-                    _this.imgData.src = this.result;
-
-                    _this.imgSizeCompute();
-
-                    _this.ctx    = _this.$refs.screenshotCanvas.getContext("2d");
-                    _this.imgCtx = _this.$refs.imgLoadScreenshotCanvas.getContext("2d");
-                    
-                    _this.imgPosition('center')
-                    _this.moveDomDataFs()
-
-                    _this.ctx.drawImage(
-                        _this.image,
-                        _this.imgData.left, 
-                        _this.imgData.top, 
-                        _this.imgData.width, 
-                        _this.imgData.height
-                    );
-
-                    _this.imgCtx.drawImage(
-                        _this.image,
-                        _this.imgLoadCanvasData.left, 
-                        _this.imgLoadCanvasData.top, 
-                        _this.moveDomData.width, 
-                        _this.moveDomData.height
-                    );
-                    let timeoutid = setTimeout(() => {
-                        _this.newImgFill();
-                        clearTimeout(timeoutid);
-                    }, 100);
-                };
-                _this.image.src= this.result;
+                _this.newAddImage(this.result)
             }
 
         },
@@ -427,6 +399,44 @@ export default {
                     this.imgData.height  = this.width / sclae;
                 }
             }
+        },
+        newAddImage(data){
+            this.image    = new Image();
+            if(typeof data == 'string' && data.indexOf('http') >= 0){
+                this.image.setAttribute("crossOrigin",'Anonymous')
+            }
+            this.image.onload  = () => {
+                this.imgData.src = data;
+
+                this.imgSizeCompute();
+
+                this.ctx    = this.$refs.screenshotCanvas.getContext("2d");
+                this.imgCtx = this.$refs.imgLoadScreenshotCanvas.getContext("2d");
+                
+                this.imgPosition('center')
+                this.moveDomDataFs()
+
+                this.ctx.drawImage(
+                    this.image,
+                    this.imgData.left, 
+                    this.imgData.top, 
+                    this.imgData.width, 
+                    this.imgData.height
+                );
+
+                this.imgCtx.drawImage(
+                    this.image,
+                    this.imgLoadCanvasData.left, 
+                    this.imgLoadCanvasData.top, 
+                    this.moveDomData.width, 
+                    this.moveDomData.height
+                );
+                let timeoutid = setTimeout(() => {
+                    this.newImgFill();
+                    clearTimeout(timeoutid);
+                }, 100);
+            };
+            this.image.src= data;
         },
         newFill(){            // 绘制函数
 

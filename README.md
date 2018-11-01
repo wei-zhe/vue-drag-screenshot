@@ -23,6 +23,7 @@ A Vue component to drag-screenshot
     v-model="parentValue"
     :width="500"
     :height="500"
+    :imageSrc='imageSrc'
     >
 </vue-screenshot>
  ```
@@ -39,7 +40,8 @@ A Vue component to drag-screenshot
  
  |    name    |    Description   |   type   |default|
  | -----------------  | ---------------- | :--------: | :----------: |
- | width  | 截图区域宽 | Number	| 500
- | height | 截图区域高 | Number	| 500
+ | width    | 截图区域宽        | Number	| 500
+ | height   | 截图区域高        | Number	| 500
+ | imageSrc | 传入需要裁剪的图片 | String	 | ''
  
  

@@ -1,12 +1,13 @@
 <template>
   <div id="app">
     <img data-v-943796a6="" :src="parentValue">
+    <img data-v-943796a6="" :src="imgvalue">
     <div class="canvasBox">
       <vue-screenshot 
         v-model="parentValue"
         :width="500"
         :height="500"
-        :value = 'imgvalue'
+        :imageSrc='imgvalue'
       >
       </vue-screenshot>
     </div>
@@ -18,7 +19,7 @@ export default {
   name: 'app',
   data() {
     return {
-      imgvalue : '',
+      imgvalue : 'https://wei-zhe.github.io/img/logo.b8a1e139.png',
       parentValue : '123',
     }
   },
