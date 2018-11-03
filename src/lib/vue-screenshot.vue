@@ -23,11 +23,13 @@
         </label>
         
         <div class="control" v-if="imgData.src && controlData.length">
+            <div class="controlIcon" v-html='controlicon.htmlSvg'></div>
             <div class="controlBox">
                 <div class="controlBoxList">
 
                     <div 
                         v-for="item in controlData"
+                        v-html='item.icon.htmlSvg'
                         class="list"
                         :class="[item.class]" 
                         @click="settingFs(item.type)"
@@ -278,7 +280,8 @@
     </div>
 </template>
 <script>
-let timer = null;
+import screenshotIcon from './icon.js' // 导入组件
+
 export default {
     name: 'vue-screenshot',
     props: {
@@ -345,6 +348,7 @@ export default {
                 top  : 0,
                 left : 0,
             },
+            controlicon : '',
             controlData : [],
         }
     },
@@ -371,11 +375,13 @@ export default {
     methods: {
         chankControl(){
             this.controlData = [];
+            this.controlicon = screenshotIcon.setting;
             for(let key in this.control){
                 if(key !== 'contain'){
                     let keyData = {
                         class : key + 'Img',
-                        type  : key, 
+                        type  : key,
+                        icon  : screenshotIcon[key], 
                     }
                     this.controlData.push(keyData);
                 }
@@ -739,12 +745,18 @@ export default {
         top: 5%;
         right: 5%;
         z-index: 120;
-        background: url(./setting.svg)no-repeat;
-        background-size: contain;
         overflow: hidden;
         cursor: pointer;
         transition: all 0.3s;
-        
+        .controlIcon{
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 24px;
+            height: 24px;
+            background-color: #fff;
+            border-radius: 3px;
+        }
         &:hover{
             height: 162px;
         }
@@ -782,26 +794,6 @@ export default {
                     &:hover{
                         background-color: #ddd;
                     }
-                }
-                .clearsImg{
-                    margin-top: 5px;                    
-                    background: url(./clear.svg)no-repeat;
-                    background-size: contain;
-                }
-                .restoreImg{
-                    margin-top: 5px;
-                    background: url(./center.svg)no-repeat;
-                    background-size: contain;
-                }
-                .blowupImg{
-                    margin-top: 5px;
-                    background: url(./scalebig.svg)no-repeat;
-                    background-size: contain;
-                }
-                .narrowImg{
-                    margin-top: 5px;
-                    background: url(./narrowImg.svg)no-repeat;
-                    background-size: contain;
                 }
             }
         }
