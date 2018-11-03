@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     <img data-v-943796a6="" :src="parentValue">
-    <img data-v-943796a6="" :src="imgvalue">
     <div class="canvasBox">
       <vue-screenshot 
-        v-model="parentValue"
-        :width="500"
-        :height="500"
-        :imageSrc='imgvalue'
+        v-model   = "parentValue"
+        :width    = "500"
+        :height   = "500"
+        :imageSrc = 'imgvalue'
+        :control  = 'control'
       >
       </vue-screenshot>
     </div>
@@ -21,6 +21,12 @@ export default {
     return {
       imgvalue : 'https://wei-zhe.github.io/img/logo.b8a1e139.png',
       parentValue : '123',
+      control  : {
+        narrow   : true,  // 缩小
+        clears   : true,  // 清除
+        restore  : true,  // 还原
+        blowup   : true,  // 放大
+      }
     }
   },
   watch : {

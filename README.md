@@ -24,8 +24,16 @@ A Vue component to drag-screenshot
     :width="500"
     :height="500"
     :imageSrc='imageSrc'
+    :control  = 'control'
     >
 </vue-screenshot>
+
+control  : {
+    narrow   : true,  // 缩小
+    clears   : true,  // 清除
+    restore  : true,  // 还原
+    blowup   : true,  // 放大
+}
  ```
 
 ## v-model
@@ -43,5 +51,6 @@ A Vue component to drag-screenshot
  | width    | 截图区域宽        | Number	| 500 |（必传）
  | height   | 截图区域高        | Number	| 500 |（必传）
  | imageSrc | 传入需要裁剪的图片 | String	 |     | 选择参数，也可以不传
+ | control  | 组建功能按钮      | Object	|     | 选择参数，也可以不传
  
  

@@ -5,12 +5,14 @@
             'height' : height + 'px',
         }"
         class="screenshot" 
-        @contextmenu="stopRightKey($event)">
+        @contextmenu="stopRightKey($event)"
+    >
         <input 
             id="imageScreenshotPic" 
             type="file" 
             name="files[]" 
             accept='image/jpeg, image/jpg, image/png' 
+            :value="inputData"
             v-on:change="uploadImage($event)"
             style="display: none;"
         />
@@ -19,6 +21,22 @@
             上传图片
             </div>
         </label>
+        
+        <div class="control" v-if="imgData.src && controlData.length">
+            <div class="controlBox">
+                <div class="controlBoxList">
+
+                    <div 
+                        v-for="item in controlData"
+                        class="list"
+                        :class="[item.class]" 
+                        @click="settingFs(item.type)"
+                    ></div>
+
+                </div>
+            </div>
+        </div>
+
         <canvas 
             ref="screenshotCanvas"
             id="screenshotCanvas" 
@@ -37,8 +55,7 @@
         >
             您的浏览器不支持 HTML5 canvas 标签。
         </canvas>
-        <div class="canvasMask">
-        </div>
+
         <div 
             v-if="imgData.src"
             class="moveDom"
@@ -210,7 +227,9 @@
                 "
             ></span>
         </div>
+
         <div 
+            v-if="imgData.src"
             class="lineImg"
             :style="{
                 'width'  : '100%',
@@ -220,7 +239,9 @@
             }"
         >
         </div>
+
         <div 
+            v-if="imgData.src"
             class="lineImg"
             :style="{
                 'width'  : '100%',
@@ -230,7 +251,9 @@
             }"
         >
         </div>
+
         <div 
+            v-if="imgData.src"
             class="lineImg"
             :style="{
                 'width'  : (moveDomData.left > 0 ? moveDomData.left : 0) + 'px',
@@ -240,7 +263,9 @@
             }"
         >
         </div>
+
         <div  
+            v-if="imgData.src"
             class="lineImg"
             :style="{
                 'width'  : moveDomData.rightWidth  + 'px',
@@ -265,11 +290,19 @@ export default {
             type: Number,
             default: 500
         }, 
-        parentValue : {},
+        parentValue : {
+
+        },
         imageSrc : {
             type: String,
             default: ''
         },
+        control  : {
+            type: Object,
+            default:function () {
+                return {};
+            }
+        }
     },
     model: {
       prop: 'value',//绑定的值，通过父组件传递
@@ -277,11 +310,11 @@ export default {
     },
     data() {
         return {
+            inputData : '',
             imgData : {
                 src    : false,
                 top    : 0,
                 left   : 0,
-                scale  : 1,
                 width  : 0,
                 height : 0,
             },
@@ -312,31 +345,43 @@ export default {
                 top  : 0,
                 left : 0,
             },
+            controlData : [],
         }
     },
     watch : {
-        'imageSrc': function(val, oldval) {
+        'imageSrc':       function(val, oldval) {
             this.newAddImage(this.imageSrc)
         },
-        'imgData.top': function(val, oldval) {
-        },
-        'imgData.left': function(val, oldval) {
-        },
         'imgData.height': function(val, oldval) {
-            this.moveDomData.height = this.imgData.height;
             this.moveDomDataFs();
         },
-        'imgData.width': function(val, oldval) {
-            this.moveDomData.width = this.imgData.width;
+        'imgData.width':  function(val, oldval) {
             this.moveDomDataFs();
+        },
+        'control':        function(val, oldval) {
+            this.chankControl();
         },
     },
     computed: {  
     },
     mounted () {
-        this.newAddImage(this.imageSrc)
+        this.newAddImage(this.imageSrc);
+        this.chankControl();
     },
     methods: {
+        chankControl(){
+            this.controlData = [];
+            for(let key in this.control){
+                if(key !== 'contain'){
+                    let keyData = {
+                        class : key + 'Img',
+                        type  : key, 
+                    }
+                    this.controlData.push(keyData);
+                }
+
+            }
+        },
         uploadImage(event) {  // 素材上传图片
             this.file = event.target.files[0];
                     if (!this.file || !this.file.name) return;
@@ -399,6 +444,8 @@ export default {
                     this.imgData.height  = this.width / sclae;
                 }
             }
+            this.moveDomData.height = this.imgData.height;
+            this.moveDomData.width = this.imgData.width;
         },
         newAddImage(data){
             this.image    = new Image();
@@ -409,12 +456,14 @@ export default {
                 this.imgData.src = data;
 
                 this.imgSizeCompute();
-
+                
                 this.ctx    = this.$refs.screenshotCanvas.getContext("2d");
                 this.imgCtx = this.$refs.imgLoadScreenshotCanvas.getContext("2d");
                 
                 this.imgPosition('center')
                 this.moveDomDataFs()
+                this.moveDomData.left = this.imgData.left;
+                this.moveDomData.top  = this.imgData.top;
 
                 this.ctx.drawImage(
                     this.image,
@@ -482,8 +531,6 @@ export default {
                 case 'center':
                     this.imgData.top  = (this.height - this.imgData.height)/2;
                     this.imgData.left = (this.width - this.imgData.width)/2;
-                    this.moveDomData.left += this.imgData.left;
-                    this.moveDomData.top  += this.imgData.top;
                     break;
             }
         },
@@ -585,9 +632,66 @@ export default {
             e.returnValue=false;  
             return false; 
         },
-        updataCanvasImg(){
+        updataCanvasImg(){  // 更新返回数据
             let imgDataProps =  this.$refs.imgLoadScreenshotCanvas.toDataURL("image/png");
             this.$emit('update', imgDataProps)
+        },
+        clearAllData(){ // 重置data数据/
+            this.inputData = '';
+            for(let key in this.imgData){
+                this.imgData[key] = 0;
+            }
+            this.imgData.src = false;
+            this.file = false;
+            for(let key in this.moveDomData){
+                this.moveDomData[key] = 0;
+            }
+            for(let key in this.moveData){
+                this.moveData[key] = 0;
+            }
+            for(let key in this.maskDomData){
+                this.maskDomData[key] = 0;
+            }
+            for(let key in this.imgLoadCanvasData){
+                this.imgLoadCanvasData[key] = 0;
+            }
+        },
+        sclaeFS(scaleNum){  // 放大缩小图片
+            this.imgData.width  = this.imgData.width * scaleNum;
+            this.imgData.height = this.imgData.height * scaleNum;
+            this.imgPosition('center');
+            this.newFill();
+            this.newImgFill();
+        },
+        settingFs(data){    // 设置函数
+            switch(data){
+                case 'clears': //  清除画布
+                    this.ctx.clearRect(
+                        0, 
+                        0, 
+                        this.width,
+                        this.height
+                    );
+                    this.imgCtx.clearRect(
+                        0, 
+                        0, 
+                        this.moveDomData.width, 
+                        this.moveDomData.height
+                    );
+                    this.clearAllData();
+                    this.$emit('update', false);
+                    break;
+                case 'restore': // 居中贴合 
+                    this.settingFs('clears');
+                    this.newAddImage(this.image.src);
+                    break;
+                case 'blowup': // 居中贴合 
+                    this.sclaeFS(1.05)
+                    break;
+                case 'narrow': // 居中贴合 
+                    this.sclaeFS(0.95)
+                    break;
+            }
         },
     }
 }
@@ -627,6 +731,81 @@ export default {
             background: #409EFF;
         }
     }
+    .control{
+        width: 30px;
+        height: 30px;
+        line-height: 20px;
+        position: absolute;
+        top: 5%;
+        right: 5%;
+        z-index: 120;
+        background: url(./setting.svg)no-repeat;
+        background-size: contain;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s;
+        
+        &:hover{
+            height: 162px;
+        }
+
+        .controlBox{
+            width: 30px;
+            min-height: 45px;
+            padding-top: 20px;
+            position: relative;
+            &:before{
+                content: '';
+                position: absolute;
+                top: 30px;
+                left: 10px;
+                width: 0;
+                height: 0;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-bottom: 10px solid #000;
+            }
+
+            .controlBoxList{
+                margin-top: 20px; 
+                width: 24px;
+                min-height: 24px;
+                padding: 2px;
+                border: 1px solid #000;
+                border-radius: 3px;
+
+                .list{
+                    width: 24px;
+                    height: 24px;
+                    background-color: #fff;
+                    border-radius: 3px;
+                    &:hover{
+                        background-color: #ddd;
+                    }
+                }
+                .clearsImg{
+                    margin-top: 5px;                    
+                    background: url(./clear.svg)no-repeat;
+                    background-size: contain;
+                }
+                .restoreImg{
+                    margin-top: 5px;
+                    background: url(./center.svg)no-repeat;
+                    background-size: contain;
+                }
+                .blowupImg{
+                    margin-top: 5px;
+                    background: url(./scalebig.svg)no-repeat;
+                    background-size: contain;
+                }
+                .narrowImg{
+                    margin-top: 5px;
+                    background: url(./narrowImg.svg)no-repeat;
+                    background-size: contain;
+                }
+            }
+        }
+    }
     .moveDom{
         position: absolute;
         z-index: 100;
@@ -662,18 +841,6 @@ export default {
         margin: auto;
         z-index: 10;
     }
-    .canvasMask{
-        width: 100%;
-        height: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        margin: auto;
-        background: #fff;
-        z-index: 5;
-    }
     #imgLoadScreenshotCanvas{
         position: absolute;
         top: 0;
@@ -682,6 +849,7 @@ export default {
         right: 0;
         margin: auto;
         z-index: 0;
+        opacity: 0;
     }
     .cirque{
         position: absolute;
