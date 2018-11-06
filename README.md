@@ -53,4 +53,4 @@ control  : {
  | imageSrc | 传入需要裁剪的图片 | String	 |     | 选择参数，也可以不传
  | control  | 组建功能按钮      | Object	|     | 选择参数，也可以不传
  
- 
+ ![dragScreenshot](./readmeimg/action.png)
