@@ -26,6 +26,8 @@ export default {
         clears   : true,  // 清除
         restore  : true,  // 还原
         blowup   : true,  // 放大
+        wheel    : true,  // 滚轮缩放 ** 新增
+        uniform  : true,  // uniform状态，图片不可拖动 ** 新增
       }
     }
   },

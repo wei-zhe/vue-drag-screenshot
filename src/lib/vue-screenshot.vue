@@ -6,6 +6,8 @@
         }"
         class="screenshot" 
         @contextmenu="stopRightKey($event)"
+        @mouseenter="onMouseLive = true;" 
+        @mouseleave="onMouseLive = false;"
     >
         <input 
             id="imageScreenshotPic" 
@@ -341,8 +343,11 @@ export default {
                 preY   : 0,
                 preX   : 0,
                 type   : 0,
-                rightWidth   : 0,
-                bottomHeight : 0,
+                rightWidth    : 0,
+                bottomHeight  : 0,
+                mousewheel    : true,
+                mousewheelImg : false,
+                mousewheelBox : false,
             },
             imgLoadCanvasData : {
                 top  : 0,
@@ -350,6 +355,7 @@ export default {
             },
             controlicon : '',
             controlData : [],
+            onMouseLive : false,
         }
     },
     watch : {
@@ -371,21 +377,44 @@ export default {
     mounted () {
         this.newAddImage(this.imageSrc);
         this.chankControl();
+        //在mounted()方法里监听mousewheel；
+        // chrome and ie
+        window.addEventListener('mousewheel',this.handleScroll,false);
+        //// firefox
+        window.addEventListener("DOMMouseScroll",this.handleScroll,false);
+
     },
     methods: {
         chankControl(){
             this.controlData = [];
             this.controlicon = screenshotIcon.setting;
             for(let key in this.control){
-                if(key !== 'contain'){
-                    let keyData = {
-                        class : key + 'Img',
-                        type  : key,
-                        icon  : screenshotIcon[key], 
-                    }
-                    this.controlData.push(keyData);
+                switch(key){
+                    case 'narrow'  :
+                    case 'clears'  :
+                    case 'restore' :
+                    case 'blowup'  :
+                        let keyData = {
+                            class : key + 'Img',
+                            type  : key,
+                            icon  : screenshotIcon[key], 
+                        }
+                        this.controlData.push(keyData);
+                        break;
+                    case 'wheel'   :
+                        if(this.control[key]){
+                            this.moveDomData.mousewheelImg = true;
+                        }else{
+                            this.moveDomData.mousewheelImg = false;
+                        }
+                        break;
+                    case 'uniform':
+                        if(this.control.wheel){
+                            this.moveDomData.mousewheelImg = false;
+                            this.moveDomData.mousewheelBox = true;
+                        }
+                        break;
                 }
-
             }
         },
         uploadImage(event) {  // 素材上传图片
@@ -513,7 +542,6 @@ export default {
 
         },
         newImgFill(){            // 绘制函数
-       
             this.imgLoadCanvasData.left = this.imgData.left - this.moveDomData.left;
             this.imgLoadCanvasData.top  = this.imgData.top  - this.moveDomData.top;
 
@@ -531,6 +559,11 @@ export default {
                 this.imgData.height,
             );
             this.updataCanvasImg();
+
+            if(this.control.uniform){
+                
+                this.imgMousemoveFs();
+            }
         },
         imgPosition(type){    // 图片定位
             switch(type){
@@ -557,20 +590,65 @@ export default {
         },
         imgMousemoveFs(e){    // 图片鼠标移动
             if(!this.imgData.src)return;
-            this.imgData.left += (e.pageX - this.moveData.preX);
-            this.imgData.top  += (e.pageY - this.moveData.preY);
-            this.moveData.preX = e.pageX;
-            this.moveData.preY = e.pageY;
-            this.newFill();
+            if(e){
+                this.imgData.left += (e.pageX - this.moveData.preX);
+                this.imgData.top  += (e.pageY - this.moveData.preY);
+                this.moveData.preX = e.pageX;
+                this.moveData.preY = e.pageY;
+                this.newFill();
+            }else{
+                let testPosition  ={
+                    top  : (this.height - this.moveDomData.height) / 2,
+                    left : (this.width - this.moveDomData.width) / 2,
+                };
+
+                let timeStep = 0,
+                    heightwidth = {
+                       imgDataLeft : ( ( testPosition.left + this.imgLoadCanvasData.left - this.imgData.left ) ) / 100,
+                       imgDataTop  : ( ( testPosition.top  + this.imgLoadCanvasData.top - this.imgData.top ) ) / 100,
+                       moveDomDataTop  : ( testPosition.top - this.moveDomData.top ) / 100,
+                       moveDomDataLeft : ( testPosition.left - this.moveDomData.left ) / 100,
+                    };
+                
+                let setTime = setInterval(() => {
+                    timeStep++;
+                    this.imgData.left += heightwidth.imgDataLeft;
+                    this.imgData.top  += heightwidth.imgDataTop;
+                    this.ctx.clearRect(
+                        0, 
+                        0, 
+                        this.width,
+                        this.height
+                    );
+                    this.ctx.drawImage(
+                        this.image,
+                        this.imgData.left, 
+                        this.imgData.top, 
+                        this.imgData.width, 
+                        this.imgData.height,
+                    );
+                    this.moveDomData.top  += heightwidth.moveDomDataTop;
+                    this.moveDomData.left += heightwidth.moveDomDataLeft;
+                    this.moveDomDataFs();
+                    if(timeStep > 100){
+                        clearInterval(setTime);
+                    }
+                }, 3);
+
+                // this.imgData.left = testPosition.left + this.imgLoadCanvasData.left;
+                // this.imgData.top  = testPosition.top + this.imgLoadCanvasData.top;
+                // this.moveDomData.top  = testPosition.top;
+                // this.moveDomData.left = testPosition.left;
+            }
         },
-        moveDomMousedownFs(e, type){  // 图片鼠标按下
+        moveDomMousedownFs(e, type){  // 截图鼠标按下
             this.moveDomData.type = type;
             this.moveDomData.preX = e.pageX;
             this.moveDomData.preY = e.pageY;
             document.addEventListener('mousemove', this.moveDomMousemoveFs);
             document.addEventListener('mouseup', this.moveDomMouseupFs);
         },
-        moveDomMouseupFs(e, type){    // 图片鼠标弹起
+        moveDomMouseupFs(e, type){    // 截图鼠标弹起
             this.moveDomData.type = type;
             this.moveDomData.preX = e.pageX;
             this.moveDomData.preY = e.pageY;
@@ -578,7 +656,7 @@ export default {
             document.removeEventListener('mouseup', this.moveDomMouseupFs);
             this.newImgFill();
         },
-        moveDomMousemoveFs(e){        // 图片鼠标移动
+        moveDomMousemoveFs(e){        // 截图鼠标移动
             switch(this.moveDomData.type){
                 case 0:
                     this.moveDomData.left += (e.pageX - this.moveDomData.preX);
@@ -618,10 +696,26 @@ export default {
                     this.moveDomData.left += (e.pageX - this.moveDomData.preX);
                     this.moveDomData.top  += (e.pageY - this.moveDomData.preY);
                     break;
+                case 9:
+                    this.moveDomData.left -= 1;
+                    this.moveDomData.top  -= 1;
+                    this.moveDomData.height += 2;
+                    this.moveDomData.width  += 2;
+                    this.moveDomData.mousewheel = true;
+                    break;
+                case 10:
+                    this.moveDomData.left += 1;
+                    this.moveDomData.top  += 1;
+                    this.moveDomData.height -= 2;
+                    this.moveDomData.width  -= 2;
+                    this.moveDomData.mousewheel = true;
+                    break;
             }
             
-            this.moveDomData.preX = e.pageX;
-            this.moveDomData.preY = e.pageY;
+            if(e){
+                this.moveDomData.preX = e.pageX;
+                this.moveDomData.preY = e.pageY;
+            }
             this.moveDomDataFs();
         },
         moveDomDataFs(){ // 移动dom遮罩宽高计算
@@ -668,6 +762,7 @@ export default {
             this.imgPosition('center');
             this.newFill();
             this.newImgFill();
+            this.moveDomData.mousewheel = true;
         },
         settingFs(data){    // 设置函数
             switch(data){
@@ -699,6 +794,30 @@ export default {
                     break;
             }
         },
+        handleScroll (e) {
+            let direction = e.deltaY>0?'down':'up'; // 该语句可以用来判断滚轮是向上滑动还是向下
+            if(this.moveDomData.mousewheel && this.onMouseLive){
+                this.moveDomData.mousewheel = false;
+                
+                if( this.moveDomData.mousewheelBox ){
+                    if(direction == 'down'){
+                        this.moveDomData.type = 9;
+                        this.moveDomMousemoveFs();
+                    }else if(direction == 'up'){
+                        this.moveDomData.type = 10;
+                        this.moveDomMousemoveFs();
+                    }
+                }
+                if( this.moveDomData.mousewheelImg ){
+                    if(direction == 'down'){
+                        this.sclaeFS(1.003);
+                    }else if(direction == 'up'){
+                        this.sclaeFS(0.997);
+                    }
+                }
+            }
+        }
+             
     }
 }
 </script>

@@ -33,8 +33,14 @@ control  : {
     clears   : true,  // 清除
     restore  : true,  // 还原
     blowup   : true,  // 放大
+    wheel    : true,  // 滚轮缩放 ** 新增
+    uniform  : true,  // uniform状态，图片不可拖动 ** 新增
 }
  ```
+### wheel 
+滚动属性，当滚动属性开启时，支持滚轮放大图片；
+### uniform
+当uniform属性开启时，每次截取区域截图都会自动居中滚轮放大会由图片转至放大选框
 
 ## v-model
 实时刷新的截图
