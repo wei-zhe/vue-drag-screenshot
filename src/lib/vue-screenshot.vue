@@ -76,7 +76,7 @@
         
         <div 
             v-if="imgData.src"
-            class="lineImg"
+            class="lineImg borderColor"
             @mousedown="
                 moveDomMousedownFs($event, 8)
             " 
@@ -88,12 +88,12 @@
                 'height' : moveDomData.height + 'px',
                 'top'    : moveDomData.top    + 'px',
                 'left'   : moveDomData.left   + 'px',
-                'border' : '1px solid #409EFF',
                 'background' : 'rgba(238, 238, 248, 0)', 
                 'z-index': 110,
             }"
         >
             <span class="cirque"
+                v-if="moveDomData.dragBoxSize"
                 @mousedown="
                     stopDocument($event);
                     moveDomMousedownFs($event, 0)
@@ -110,7 +110,8 @@
                     cursor: se-resize;
                 "
             ></span>
-                <span class="cirque"
+            <span class="cirque"
+                v-if="moveDomData.dragBoxSize"
                 @mousedown="
                     stopDocument($event);
                     moveDomMousedownFs($event, 2)
@@ -127,7 +128,8 @@
                     cursor: sw-resize;
                 "
             ></span>
-                <span class="cirque"
+            <span class="cirque"
+                v-if="moveDomData.dragBoxSize"
                 @mousedown="
                     stopDocument($event);
                     moveDomMousedownFs($event, 3);
@@ -144,7 +146,8 @@
                     cursor: ne-resize;
                 "
             ></span>
-                <span class="cirque"
+            <span class="cirque"
+                v-if="moveDomData.dragBoxSize"
                 @mousedown="
                     stopDocument($event);
                     moveDomMousedownFs($event, 1)
@@ -161,7 +164,8 @@
                     cursor: nw-resize;
                 "
             ></span>
-                <span class="cirque"
+            <span class="cirque"
+                v-if="moveDomData.dragBoxSize"
                 @mousedown="
                     stopDocument($event);
                     moveDomMousedownFs($event, 4)
@@ -178,7 +182,8 @@
                     cursor: s-resize;
                 "
             ></span>
-                <span class="cirque"
+            <span class="cirque"
+                v-if="moveDomData.dragBoxSize"
                 @mousedown="
                     stopDocument($event);
                     moveDomMousedownFs($event, 5)
@@ -195,7 +200,8 @@
                     cursor: n-resize;
                 "
             ></span>
-                <span class="cirque"
+            <span class="cirque"
+                v-if="moveDomData.dragBoxSize"
                 @mousedown="
                     stopDocument($event);
                     moveDomMousedownFs($event, 6)
@@ -213,7 +219,8 @@
                     cursor: e-resize;
                 "
             ></span>
-                <span class="cirque"
+            <span class="cirque"
+                v-if="moveDomData.dragBoxSize"
                 @mousedown="
                     stopDocument($event);
                     moveDomMousedownFs($event, 7)
@@ -348,6 +355,7 @@ export default {
                 mousewheel    : true,
                 mousewheelImg : false,
                 mousewheelBox : false,
+                dragBoxSize   : true,
             },
             imgLoadCanvasData : {
                 top  : 0,
@@ -388,6 +396,7 @@ export default {
         chankControl(){
             this.controlData = [];
             this.controlicon = screenshotIcon.setting;
+            this.moveDomData.dragBoxSize = true;
             for(let key in this.control){
                 switch(key){
                     case 'narrow'  :
@@ -413,6 +422,11 @@ export default {
                             this.moveDomData.mousewheelImg = false;
                             this.moveDomData.mousewheelBox = true;
                         }
+                        break;
+                    case 'dragBox' :
+                        this.moveDomData.dragBoxSize = false;
+                        this.moveDomData.height = this.control[key].height;
+                        this.moveDomData.width  = this.control[key].width;
                         break;
                 }
             }
@@ -479,8 +493,10 @@ export default {
                     this.imgData.height  = this.width / sclae;
                 }
             }
-            this.moveDomData.height = this.imgData.height;
-            this.moveDomData.width = this.imgData.width;
+            if(this.moveDomData.dragBoxSize){
+                this.moveDomData.height = this.imgData.height;
+                this.moveDomData.width = this.imgData.width;
+            }
         },
         newAddImage(data){
             this.image    = new Image();
@@ -497,8 +513,13 @@ export default {
                 
                 this.imgPosition('center')
                 this.moveDomDataFs()
-                this.moveDomData.left = this.imgData.left;
-                this.moveDomData.top  = this.imgData.top;
+                if(this.moveDomData.dragBoxSize){
+                    this.moveDomData.left = this.imgData.left;
+                    this.moveDomData.top  = this.imgData.top;
+                }else{
+                    this.moveDomData.left = (this.width - this.moveDomData.width) / 2;
+                    this.moveDomData.top  = (this.height - this.moveDomData.height) / 2;
+                }
 
                 this.ctx.drawImage(
                     this.image,
@@ -927,8 +948,33 @@ export default {
     .lineImg{
         position: absolute;
         z-index: 90;
-        background: rgba(238, 238, 248, 0.3) 
+        background: rgba(238, 238, 248, 0.3);
+
     }
+    .borderColor{
+        &:before{
+            position: absolute;
+            display: block;
+            content: '';
+            border: 1px solid #fff;
+            height: 100%;
+            width: 100%;
+            margin: -1px;
+            box-sizing: content-box;
+            pointer-events: none;
+        }
+        &:after{
+            position: absolute;
+            display: block;
+            content: '';
+            border : 1px dashed #409EFF;
+            height: 100%;
+            width: 100%;
+            margin: -1px;
+            box-sizing: content-box;
+            pointer-events: none;
+        }
+    } 
     .moveDomBox{
         width: 100%;
         height: 100%;

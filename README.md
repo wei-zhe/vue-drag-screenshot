@@ -35,6 +35,10 @@ control  : {
     blowup   : true,  // 放大
     wheel    : true,  // 滚轮缩放 ** 新增
     uniform  : true,  // uniform状态 ** 新增
+    dragBox  : {      // 新增拖拽盒子固定尺寸/比例** 新增
+        width   : 160,
+        height  : 90,
+    }
 }
  ```
 ### wheel 
