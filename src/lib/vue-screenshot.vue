@@ -294,11 +294,11 @@ import screenshotIcon from './icon.js' // 导入组件
 export default {
     name: 'vue-screenshot',
     props: {
-        width: { // 密码位数
+        width: { 
             type: Number,
             default: 500
         }, 
-        height: { // 密码位数
+        height: { 
             type: Number,
             default: 500
         }, 
@@ -379,6 +379,24 @@ export default {
         'control':        function(val, oldval) {
             this.chankControl();
         },
+        'control.narrow':        function(val, oldval) {
+            this.chankControl();
+        },
+        'control.clears':        function(val, oldval) {
+            this.chankControl();
+        },
+        'control.restore':        function(val, oldval) {
+            this.chankControl();
+        },
+        'control.blowup':        function(val, oldval) {
+            this.chankControl();
+        },
+        'control.wheel':        function(val, oldval) {
+            this.chankControl();
+        },
+        'control.dragBox':        function(val, oldval) {
+            this.chankControl();
+        },
     },
     computed: {  
     },
@@ -403,13 +421,23 @@ export default {
                     case 'clears'  :
                     case 'restore' :
                     case 'blowup'  :
-                        let keyData = {
-                            class : key + 'Img',
-                            type  : key,
-                            icon  : screenshotIcon[key], 
+                        if(this.control[key]){
+                            let keyData = {
+                                class : key + 'Img',
+                                type  : key,
+                                icon  : screenshotIcon[key], 
+                            }
+                            this.controlData.push(keyData);
+                            break;
+                        }else{
+                            for(let j = 0; j < this.controlData.length; j++) {
+                                let thisdata = this.controlData[j];
+                                if(thisdata.type == key){
+                                    this.controlData.splice(j , 1);
+                                    console.log(this.controlData)
+                                }
+                            } 
                         }
-                        this.controlData.push(keyData);
-                        break;
                     case 'wheel'   :
                         if(this.control[key]){
                             this.moveDomData.mousewheelImg = true;
@@ -418,15 +446,22 @@ export default {
                         }
                         break;
                     case 'uniform':
-                        if(this.control.wheel){
+                        if(this.control.wheel && this.control.uniform){
                             this.moveDomData.mousewheelImg = false;
                             this.moveDomData.mousewheelBox = true;
+                        }else{
+                            this.moveDomData.mousewheelImg = true;
+                            this.moveDomData.mousewheelBox = false;
                         }
                         break;
                     case 'dragBox' :
-                        this.moveDomData.dragBoxSize = false;
-                        this.moveDomData.height = this.control[key].height;
-                        this.moveDomData.width  = this.control[key].width;
+                        if(this.control.dragBox){
+                            this.moveDomData.dragBoxSize = false;
+                            this.moveDomData.height = this.control[key].height;
+                            this.moveDomData.width  = this.control[key].width;
+                        }else{
+                            this.moveDomData.dragBoxSize = true;
+                        }
                         break;
                 }
             }

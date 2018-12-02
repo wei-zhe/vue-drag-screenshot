@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <img data-v-943796a6="" :src="parentValue">
+    <span class="setcontrol" @click="setcontrol()"> setdata</span>
     <div class="canvasBox">
       <vue-screenshot 
         v-model   = "parentValue"
@@ -38,18 +39,14 @@ export default {
   watch : {
     'parentValue': function(val, oldval) {
     },
+    'control.restore': function(val, oldval) {
+      console.log('sadgasdhk', this.control)
+    },
   },
   methods: {
-    pasEnd(val) {
-      console.log(val);  //得到密码 可能会进行一些加密动作
-      setTimeout(() => { // 模拟请求接口验证密码中 .. 
-        if (val === '111111') {
-          this.$refs.pay.$payStatus(true) // 传递给子组件
-        } else {
-          this.$refs.pay.$payStatus(false)
-        }
-      }, 1000)
-    },
+    setcontrol(){
+      this.control.dragBox = false;
+    }
   }
 }
 </script>
