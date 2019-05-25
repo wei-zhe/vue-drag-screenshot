@@ -1,10 +1,11 @@
 {
   "name": "vue-drag-screenshot",
   "description": "A Vue component to drag-screenshot",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "author": "WeiZhe <2270734250@qq.com>",
   "license": "MIT",
   "private": false,
+  "main": "lib/vue-drag-screenshot.umd.min.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/wei-zhe/vue-drag-screenshot.git"
