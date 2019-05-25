@@ -1051,9 +1051,11 @@ export default {
         border-radius: 50%;
         box-shadow: 0 0 0 1px  #409EFF;
         margin: auto;
+        transform: scale(1);
         transition: all 0.3s;
 
         &:hover{
+            transform: scale(1.3);
             box-shadow: 0 0 0 1px  #fff;
             background: #409EFF;
         }
